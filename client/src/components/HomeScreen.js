@@ -9,8 +9,10 @@ const GET_LOGOS = gql`
   query logos($email: String){
     logos(email: $email) {
       _id
-      text
       lastUpdate
+      texts{
+          text
+      }
     }
   }
 `;
@@ -116,7 +118,7 @@ console.log(this.props.session);
                                 <h3>Recent Work</h3>
                                 {data.logos.sort((x, y) => -compareDates(x.lastUpdate, y.lastUpdate)).map((logo, index) => (
                                     <div key={index} className='home_logo_link'>
-                                        <Link to={`/view/${logo._id}`} className="home_logo_link_text" style={{ cursor: "pointer" }}>{logo.text}</Link>
+                                        <Link to={`/view/${logo._id}`} className="home_logo_link_text" style={{ cursor: "pointer" }}>{logo.texts[0].text}</Link>
                                     </div>
                                 ))}
                             </div>

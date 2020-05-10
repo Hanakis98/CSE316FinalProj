@@ -6,27 +6,13 @@ import { clamp } from '../utils/utlity';
 
 const ADD_LOGO = gql`
     mutation addLogo(
-        $text: String!,
-        $color: String!,
-        $userEmail: String!,
-        $fontSize: Int!,
-        $backgroundColor: String!,
-        $borderColor: String!,
-        $borderWidth: Int!,
-        $borderRadius: Int!,
-        $padding: Int!,
-        $margin: Int!) {
+        $texts: [texts!],
+        $images: [images!],
+        $userEmail: String!]) {
         addLogo(
-            text: $text,
-            userEmail: $userEmail
-            color: $color,
-            fontSize: $fontSize,
-            backgroundColor: $backgroundColor,
-            borderColor: $borderColor,
-            borderWidth: $borderWidth,
-            borderRadius: $borderRadius,
-            padding: $padding,
-            margin: $margin) {
+            texts: $texts,
+            images: $images,
+            userEmail: $userEmail) {
             _id
         }
     }
