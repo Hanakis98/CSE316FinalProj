@@ -18,7 +18,7 @@ const ADD_LOGO = gql`
     }
 `;
 
-class CreateLogoScreen extends Component {
+class CreateLogoScreen extends Component { 
 
     constructor(props){
         super(props)
