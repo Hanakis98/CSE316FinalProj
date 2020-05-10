@@ -8,7 +8,7 @@ const ADD_LOGO = gql`
     mutation addLogo(
         $texts: [texts!],
         $images: [images!],
-        $userEmail: String!]) {
+        $userEmail: [String!]) {
         addLogo(
             texts: $texts,
             images: $images,

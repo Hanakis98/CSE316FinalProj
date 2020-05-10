@@ -1,11 +1,13 @@
 import React, { Component } from 'react';
 import '../App.css';
+
 import {
     Redirect,
     Link,
     useLocation
   } from "react-router-dom";
- 
+
+
 
 
  
@@ -61,6 +63,7 @@ changePassword(e){
                 console.log(data);
 
                 if(data.success){
+
 
                     alert("Your password has successfully been reset. You are now being redirected to the home page.");
                     this.setState({redirect: true});

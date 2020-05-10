@@ -2,8 +2,17 @@ var mongoose = require("mongoose");
 var passport = require("passport");
 var User = require("../models/User");
  
+var mail = require('nodemailer')
+var myAccount = mail.createTransport({
+service:"gmail",
+auth:{
+//Email to use is cse316teddy@gmail.com password is MyCSE316password
+user:"cse316teddy@gmail.com",
+pass:"MyCSE316password"
 
-
+}
+    
+})
 
 var userController = {};
 
@@ -90,14 +99,42 @@ userController.forgotPassword = function(req, res, next){
 
 
         if(user){
- 
+
+            var mail = {
+                from :'cse316teddy@gmail.com',
+                to: 'tedhanakis@aol.com',
+                subject: "GoLogolo change password",
+                html: `<html><a href="http://localhost:3001/changepassword?email=${email}"><h1>Click Here to Reset Your Password</h1></a></html>`
+            }
+
+        
+        myAccount.sendMail(mail,function(error,info)
+        {
+
+            if (error){
+                console.log("eror while sending email");
+                    console.log(error);
+                    console.log(info);
+                    return res.json({success:false,message: "Email could not be sent"})
+            }
+            if (info){
+                console.log(info);
+                return res.json({success:true,message: "Email was sent"})
+             }
+
+
+
+
+        })
+        
+
  // TO DO: SEND EMAIL TO USER TO RESET PASSWORD 
  // IF EMAIL IS SUCCESSFULLY SENT, REturn json where  "success" key is true 
  
 
-        }
+        
 
-
+    } 
 
     })
 }
