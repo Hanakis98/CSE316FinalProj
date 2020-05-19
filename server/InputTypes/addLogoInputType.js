@@ -15,11 +15,12 @@ var GraphQLInputObjectType = require('graphql').GraphQLInputObjectType;
 
 
 
+
+ 
+
 const textInputType = new GraphQLInputObjectType({
     name: 'textInputType',
     fields: () => ({
-        
-        
             text: {
                 type: GraphQLString
             },
@@ -29,31 +30,12 @@ const textInputType = new GraphQLInputObjectType({
             fontSize: {
                 type: GraphQLInt
             },
-            backgroundColor: {
-                type: GraphQLString
-            },
-            borderColor: {
-                type: GraphQLString
-            },
-            borderWidth: {
-                type: GraphQLInt
-            },
-            borderRadius: {
-                type: GraphQLInt
-            },
-            padding: {
-                type: GraphQLInt
-            },
-            margin: {
-                type: GraphQLInt
-            },
             x: {
                 type: GraphQLInt
             },
             y: {
                 type: GraphQLInt 
             }
-        
     })
 })
 
@@ -62,8 +44,6 @@ const textInputType = new GraphQLInputObjectType({
 const imageInputType = new GraphQLInputObjectType({
     name: 'imageInputType',
     fields: () => ({
-        
-        
             src: {
                 type: GraphQLString,
             },
@@ -75,12 +55,40 @@ const imageInputType = new GraphQLInputObjectType({
 })
 
 
+
 const addLogoInputType = new GraphQLInputObjectType({
     name: 'addLogoInputType',
     fields: () => ({
         userEmail:{
             type: GraphQLString
         },
+
+        backgroundColor: {
+            type: GraphQLString
+        },
+        borderColor: {
+            type: GraphQLString
+        },
+        borderWidth: {
+            type: GraphQLInt
+        },
+        borderRadius: {
+            type: GraphQLInt
+        },
+        padding: {
+            type: GraphQLInt
+        },
+        margin: {
+            type: GraphQLInt
+        },
+
+        height: {
+            type: GraphQLInt
+        },
+        width: {
+            type: GraphQLInt
+        },
+
       texts: {
         type: new GraphQLList(textInputType),
       },
@@ -90,5 +98,7 @@ const addLogoInputType = new GraphQLInputObjectType({
     }),
   });
   
+
+
 
 module.exports = addLogoInputType;

@@ -1,0 +1,30 @@
+mutation ($logo: addLogoInputType) {
+  addLogo(input: $logo) {
+    lastUpdate
+  }
+}
+
+
+
+# Store this in the Query Variables section in GraphiQL
+{
+  "logo": {
+       "userEmail": "GUEST",
+        "backgroundColor": "#FF0000",
+        "borderColor": "#000000",
+        "borderWidth": 2,
+        "borderRadius": 20,
+        "padding": 15,
+        "margin": 10,
+      "texts": [
+        {
+         "text": "Logo Text",
+            "color": "#FFFFFF",
+            "fontSize": 20,
+            "x": 100,
+            "y": 50
+      }
+      ],
+      "images": []
+    }
+}

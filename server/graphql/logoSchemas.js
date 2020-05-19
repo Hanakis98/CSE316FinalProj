@@ -71,24 +71,6 @@ var textType = new GraphQLObjectType({
             fontSize: {
                 type: GraphQLInt
             },
-            backgroundColor: {
-                type: GraphQLString
-            },
-            borderColor: {
-                type: GraphQLString
-            },
-            borderWidth: {
-                type: GraphQLInt
-            },
-            borderRadius: {
-                type: GraphQLInt
-            },
-            padding: {
-                type: GraphQLInt
-            },
-            margin: {
-                type: GraphQLInt
-            },
             x: {
                 type: GraphQLInt
             },
@@ -107,6 +89,33 @@ var logoType = new GraphQLObjectType({
         return {
             _id: {
                 type: GraphQLString
+            },
+            height: {
+                type: GraphQLInt
+            },
+            width: {
+                type: GraphQLInt
+            },
+            userEmail: {
+                type: GraphQLString
+            },
+            backgroundColor: {
+                type: GraphQLString
+            },
+            borderColor: {
+                type: GraphQLString
+            },
+            borderWidth: {
+                type: GraphQLInt
+            },
+            borderRadius: {
+                type: GraphQLInt
+            },
+            padding: {
+                type: GraphQLInt
+            },
+            margin: {
+                type: GraphQLInt
             },
             texts: {type: GraphQLList(textType)},
             images: {type: GraphQLList(imageType)},
@@ -222,7 +231,7 @@ var queryType = new GraphQLObjectType({
             },
 
          
-            logos: {
+            findLogosByEmail: {
                 type: new GraphQLList(logoType), 
                 args: {
                     email: {
@@ -341,7 +350,7 @@ var mutation = new GraphQLObjectType({
                 },
                 resolve(root, params) {
                     return LogoModel.findByIdAndUpdate(params.id,
-                        { texts: params.texts, images: params.images, lastUpdate: new Date() }, function (err) {
+                        { texts: params.input.texts, images: params.input.images, lastUpdate: new Date() }, function (err) {
                         if (err) return next(err);
                     });
                 }

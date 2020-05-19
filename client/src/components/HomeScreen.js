@@ -7,7 +7,7 @@ import { Redirect } from 'react-router-dom'
 
 const GET_LOGOS = gql`
   query logos($email: String){
-    logos(email: $email) {
+    findLogosByEmail(email: $email) {
       _id
       lastUpdate
       texts{
@@ -92,12 +92,11 @@ class HomeScreen extends Component {
 
     render() {
         return (
-            <Query pollInterval={500} query={GET_LOGOS} variables={{email: this.props.session.getUserEmail()}}>
+            <Query pollInterval={30000} query={GET_LOGOS} variables={{email: this.props.session.getUserEmail()}}>
                 {({ loading, error, data }) => {
                     if (loading) return 'Loading...';
                     if (error) return `Error! ${error.message}`;
-console.log(this.props.session);
-
+ 
                     return (
                         <div className="container row">
                             <div className="col s4">
@@ -116,9 +115,9 @@ console.log(this.props.session);
 
 
                                 <h3>Recent Work</h3>
-                                {data.logos.sort((x, y) => -compareDates(x.lastUpdate, y.lastUpdate)).map((logo, index) => (
+                                {data.findLogosByEmail.sort((x, y) => -compareDates(x.lastUpdate, y.lastUpdate)).map((logo, index) => (
                                     <div key={index} className='home_logo_link'>
-                                        <Link to={`/view/${logo._id}`} className="home_logo_link_text" style={{ cursor: "pointer" }}>{logo.texts[0].text}</Link>
+                                        <Link to={`/view/${logo._id}`} className="home_logo_link_text" style={{ cursor: "pointer" }}>{logo.texts.length > 0 ? logo.texts[0].text : ""}</Link>
                                     </div>
                                 ))}
                             </div>
