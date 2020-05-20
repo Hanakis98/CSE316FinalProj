@@ -8,6 +8,7 @@
     "bootstrap": "^4.3.1",
     "graphql": "^14.2.1",
     "graphql-tag": "^2.10.1",
+    "html2canvas": "^1.0.0-rc.5",
     "nodemailer": "^6.4.6",
     "passport-local": "^1.0.0",
     "react": "^16.8.6",

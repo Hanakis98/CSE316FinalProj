@@ -8,6 +8,8 @@ import Draggable from 'react-draggable';
 import { Logo, Text} from "./Logo"
 import { isObjectType } from 'graphql';
 
+import html2canvas from "html2canvas"
+
 // REQUIRED PROPS:   Logo / History
 class LogoEditor extends Component { 
 
@@ -24,6 +26,18 @@ class LogoEditor extends Component {
          //   userEmail:  props.session.getUserEmail(),
             logo: props.logo
         }
+    }
+
+
+    downloadLogo(){
+
+        html2canvas(document.getElementsByClassName('logo_container')[0], {allowTaint: true, useCORS:true}).then(function (canvas) {
+        var a = document.createElement('a');
+        a.href = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
+        a.download = 'logo.png';
+        a.click();
+      }
+      );
     }
 
 
@@ -247,7 +261,7 @@ return (
             bounds={document.getElementsByClassName("user_logo")[0]}
             onStop={ function(e, position){this.updateLogoImage(index, "x", position.x); this.updateLogoImage(index, "y", position.y); console.log(this.state.logo.texts[index])}.bind(this)}
             >
-            <div key={"logo_image_component_" + index}  className="logo_image_component"  style={Object.assign({ backgroundRepeat: "no-repeat", backgroundPosition: "cover",  backgroundSize: "cover", backgroundImage: `url(${image.src})`,  transform: `translate(${image.x}px, ${image.y}px)`}, image.fetchData(true))} onError={ function(e){ e.target.src = "https://wfpl.org/wp-content/plugins/lightbox/images/No-image-found.jpg";} } ></div>
+            <img src={image.src} key={"logo_image_component_" + index}  className="logo_image_component"  style={Object.assign({   transform: `translate(${image.x}px, ${image.y}px)`}, image.fetchData(true))} onError={ function(e){ e.target.src = "https://wfpl.org/wp-content/plugins/lightbox/images/No-image-found.jpg";} } />
             </Draggable>
         ))
 
@@ -344,6 +358,12 @@ alert("please implement this function");
                                     <div className="form-group col-8">
                                         <div className="btn btn-primary" onClick={e => this.addImage()}>Add Image</div>
                                     </div>
+
+                                    <div className="form-group col-8">
+                                        <div className="btn btn-primary" onClick={e => this.downloadLogo()}>Download Logo (png)</div>
+                                    </div>
+
+
 
                                     <button type="submit" className="btn btn-success">Submit</button>
                                 </form>
