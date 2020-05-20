@@ -4,7 +4,7 @@ import { Mutation } from "react-apollo";
 import { Link } from 'react-router-dom';
 
 import {clamp} from "../utils/utlity"
-
+import Draggable from 'react-draggable';
 import { Logo, Text} from "./Logo"
 import { isObjectType } from 'graphql';
 
@@ -93,32 +93,15 @@ class LogoEditor extends Component {
     swapPositions(a, b){
        // console.log("switching: " + a + " and "  + b);
        var tempReference =  Object.create(this.state.logo.texts[a])
+ 
+        this.state.logo.texts[a] = this.state.logo.texts[b];
 
-       if(tempReference.color == "xx") {
-           console.log(tempReference);
-           console.log("FOUND ERROR");
-       }
-
-
-       //update inputs' values to reflect change of order in text array
-     /*  this.state.logo.texts[a].textInput.current.value =  this.state.logo.texts[b].text;
-       this.state.logo.texts[a].fontSizeInput.current.value =  this.state.logo.texts[b].fontSize;
-       this.state.logo.texts[a].colorInput.current.value =  this.state.logo.texts[b].color; */
-       // now actually swap position of text entry objects in array (part 1)
-       this.state.logo.texts[a] = this.state.logo.texts[b];
-
-
-//update inputs' values to reflect change of order in text array (part 2)
-       /*  this.state.logo.texts[b].textInput.current.value = tempReference.text;
-         this.state.logo.texts[b].fontSizeInput.current.value = tempReference.fontSize;
-         this.state.logo.texts[b].colorInput.current.value = tempReference.color; */
-
+ 
  // now actually swap position of text entry objects in array (part 2)
        this.state.logo.texts[b] =  new Text(tempReference);
        this.state.logo.texts[b].reactKey = tempReference.reactKey;
 
-
-       console.log(this.state.logo.texts[b]);
+ 
 
        this.setState({}) // force a re-render to display new changes in order of texts
    }
@@ -238,12 +221,34 @@ return (
     generateLogoDisplay(){
 
         //zindex organizes texts such that elements at beginning of text array will be positioned in front of elements that are placed later in array
-        var texts =  this.state.logo.texts.map(function(text, index, array) {  var styles = Object.assign({}, this.state.logo.texts[index].fetchData(true)); styles.zIndex = (array.length - index); return ( 
-        <div key={"logo_text_component_" + index} className="logo_text_component" style={styles}>{text.text}</div> )
+        var texts =  this.state.logo.texts.map(function(text, index, array) {  
+            var styles = Object.assign({}, this.state.logo.texts[index].fetchData(true)); 
+            styles.cursor = "default";
+             styles.zIndex = (array.length - index); 
+             styles["transform"] = `translate(${text.x}px, ${text.y}px)`;
+             return ( 
+            <Draggable
+            key={"draggable_text_component_" + index}
+            defaultPosition={{x: text.x, y: text.y}}
+            defaultClassNameDragging={"draggedLogoComponent"}
+            bounds={document.getElementsByClassName("user_logo")[0]}
+            onStop={ function(e, position){this.updateLogoText(index, "x", position.x); this.updateLogoText(index, "y", position.y); console.log(this.state.logo.texts[index])}.bind(this)}
+            >
+            <div key={"logo_text_component_" + index} className="logo_text_component" style={styles}>{text.text}</div> 
+            </Draggable>
+            )
     }, this );
-
+    
         var images = this.state.logo.images.map((image, index, array) => (
-            <img key={"logo_image_component_" + index} className="logo_image_component" src={image.src} style={Object.assign({}, image.fetchData(true))} onError={ function(e){ e.target.src = "https://wfpl.org/wp-content/plugins/lightbox/images/No-image-found.jpg";} }    />
+            <Draggable
+            key={"draggable_image_component_" + index}
+            defaultPosition={{x: image.x, y: image.y}}
+            defaultClassNameDragging={"draggedLogoComponent"}
+            bounds={document.getElementsByClassName("user_logo")[0]}
+            onStop={ function(e, position){this.updateLogoImage(index, "x", position.x); this.updateLogoImage(index, "y", position.y); console.log(this.state.logo.texts[index])}.bind(this)}
+            >
+            <div key={"logo_image_component_" + index}  className="logo_image_component"  style={Object.assign({ backgroundRepeat: "no-repeat", backgroundPosition: "cover",  backgroundSize: "cover", backgroundImage: `url(${image.src})`,  transform: `translate(${image.x}px, ${image.y}px)`}, image.fetchData(true))} onError={ function(e){ e.target.src = "https://wfpl.org/wp-content/plugins/lightbox/images/No-image-found.jpg";} } ></div>
+            </Draggable>
         ))
 
         var logo = (

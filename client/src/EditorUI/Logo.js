@@ -44,7 +44,8 @@ fetchData(forCss){
         texts: forCss ? false : this.texts.map(function(t){return t.fetchData()}),
         images: forCss ? false : this.images.map(function(i){return i.fetchData()}),
         borderStyle: forCss ? "solid" : false, //only display for CSS purposes , NEVER for DB Storage
-        overflowY: forCss ? "hidden" : false
+        overflowY: forCss ? "hidden" : false,
+        overflowX: forCss ? "hidden" : false 
     }
 
 }
