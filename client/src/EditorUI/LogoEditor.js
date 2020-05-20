@@ -5,7 +5,8 @@ import { Link } from 'react-router-dom';
 
 import {clamp} from "../utils/utlity"
 
-import Logo from "./Logo"
+import { Logo, Text} from "./Logo"
+import { isObjectType } from 'graphql';
 
 // REQUIRED PROPS:   Logo / History
 class LogoEditor extends Component { 
@@ -89,27 +90,93 @@ class LogoEditor extends Component {
         }
     }
 
+    swapPositions(a, b){
+       // console.log("switching: " + a + " and "  + b);
+       var tempReference =  Object.create(this.state.logo.texts[a])
+
+
+       //update inputs' values to reflect change of order in text array
+     /*  this.state.logo.texts[a].textInput.current.value =  this.state.logo.texts[b].text;
+       this.state.logo.texts[a].fontSizeInput.current.value =  this.state.logo.texts[b].fontSize;
+       this.state.logo.texts[a].colorInput.current.value =  this.state.logo.texts[b].color; */
+       // now actually swap position of text entry objects in array (part 1)
+       this.state.logo.texts[a] = this.state.logo.texts[b];
+
+
+//update inputs' values to reflect change of order in text array (part 2)
+       /*  this.state.logo.texts[b].textInput.current.value = tempReference.text;
+         this.state.logo.texts[b].fontSizeInput.current.value = tempReference.fontSize;
+         this.state.logo.texts[b].colorInput.current.value = tempReference.color; */
+
+ // now actually swap position of text entry objects in array (part 2)
+       this.state.logo.texts[b] =  new Text(tempReference);
+       this.state.logo.texts[b].reactKey = tempReference.reactKey;
+
+       this.setState({}) // force a re-render to display new changes in order of texts
+   }
+   
+   
+
+     // a => index of entry
+     deleteText(a) {
+         console.log(this.state.logo.texts);
+        this.state.logo.deleteText(a);
+      
+        this.setState({}); // force a re-render to remove any traces of deleted text
+        return true;
+    }
+  
+
 
 
     generateTextUI(){
-      var textControls =  this.state.logo.texts.map( (text, index) =>
-(
-                <div className="logo_text_controller" key={`logotext-${index}`} style={{background: "#FFBBAA", padding: "10px", border: "1px solid #000", margin: "10px 0"}} >
+      
+
+        var panelButtonCSS = {
+            fontSize: "2em",
+            marginLeft: "17px",
+            cursor: "pointer",
+            width: "50px",
+            height: "50px",
+            border: "1px solid #000",
+            textAlign: "center",
+        }
+
+      var textControls =  this.state.logo.texts.map( function(text, index, array) {
+        
+        text.textInput =   React.createRef();
+       text.fontSizeInput =   React.createRef();
+       text.colorInput =  React.createRef();
+
+      // if(!text.reactKey) throw new Error("Cannot create text controls. Text entry does not have a `reactKey` property.")
+        
+return (
+                <div className="logo_text_controller"  key={text.reactKey} style={{background: "#FFBBAA", padding: "10px", border: "1px solid #000", margin: "10px 0"}} >
                         <h4>Logo Text #{index}</h4>
                         <div className="form-group col-8">
                         <label htmlFor="text">Text:</label>
-                        <input type="text" defaultValue={text.text}  onInput={e => this.updateLogoText(index, "text", e.target.value)} data-text_ref={index}  className="form-control" name="text"  placeholder="Text" />
+                        <input type="text" ref={this.state.logo.texts[index].textInput}    onInput={e => this.updateLogoText(index, "text", e.target.value)} data-text_ref={index}  className="form-control" name="text"  placeholder="Text" />
                     </div>
                     <div className="form-group col-4">
                         <label htmlFor="color">Color:</label>
-                        <input type="color" data-text_ref={index} defaultValue={text.color} onInput={e => this.updateLogoText(index, "color", e.target.value)} className="form-control" name="color"  placeholder="Color" />
+                        <input type="color" ref={this.state.logo.texts[index].colorInput}  data-text_ref={index} defaultValue={text.color} onInput={e => this.updateLogoText(index, "color", e.target.value)} className="form-control" name="color"  placeholder="Color" />
                     </div>
                     <div className="form-group col-8">
                                         <label htmlFor="fontSize">Font Size:</label>
-                                        <input type="number" min={5} max={70} data-text_ref={index} defaultValue={this.state.logo.texts[index].fontSize} onInput={ e => this.updateLogoText(index, "fontSize", clamp(e.target.value, 5, 70), true, e)}  className="form-control" name="fontSize" placeholder="Font Size" />
+                                        <input type="number" min={5} max={70} ref={this.state.logo.texts[index].fontSizeInput}  data-text_ref={index} defaultValue={this.state.logo.texts[index].fontSize} onInput={ e => this.updateLogoText(index, "fontSize", clamp(e.target.value, 5, 70), true, e)}  className="form-control" name="fontSize" placeholder="Font Size" />
                         </div>
+            
+            
+            <div className="logo_text_panel" style={{margin: "10px 0", display: "flex"}}>
+
+        <div className="text_arrow_up" style={Object.assign({background: "rgba(99, 129, 209, 0.95)", display: index == 0 ? "none": false}, panelButtonCSS )} data-text_idx={index} onClick={function(e){this.swapPositions(index, index-1)}.bind(this)}>&#8593;</div>
+        <div className="text_arrow_down" style={Object.assign({background: "rgba(99, 129, 209, 0.95)",  display:  array.length == 0 ? "none" : index == (array.length - 1) ? "none" :  false}, panelButtonCSS )}  onClick={function(e){this.swapPositions(index, index+1)}.bind(this)}    data-text_idx={index}>&#8595;</div>
+        <div className="text_delete_x"  style={Object.assign({background: "red"}, panelButtonCSS )} data-text_idx={index} onClick={function(e){this.deleteText(index)}.bind(this)} >X</div>
+
             </div>
-        ));
+            
+            </div>
+        )}, this);
 
  
  return (<div className="textUI">{textControls}</div>)
@@ -120,8 +187,9 @@ class LogoEditor extends Component {
 
     generateLogoDisplay(){
 
-        var texts =  this.state.logo.texts.map(text => ( 
-        <div className="logo_text_component" style={text.fetchData(true)}>{text.text}</div> )
+        //zindex organizes texts such that elements at beginning of text array will be positioned in front of elements that are placed later in array
+        var texts =  this.state.logo.texts.map((text, index, array) => ( 
+        <div key={"logo_text_component_" + index} className="logo_text_component" style={Object.assign({zIndex: (array.length - index)}, text.fetchData(true))}>{text.text}</div> )
         )
 
         var logo = (
@@ -174,14 +242,14 @@ alert("please implement this function");
 
                                     <div className="form-group col-8">
                                         <label htmlFor="height">Height:</label>
-                                        <input type="number"  max={700} min={100}  placeholder="Height"  defaultValue={this.state.logo.height} onInput={e => this.updateLogo("height", clamp(e.target.value, 100, 700), true, e)}  />
+                                        <input type="number"  max={700} min={10}  placeholder="Height"  defaultValue={this.state.logo.height} onInput={e => this.updateLogo("height", clamp(e.target.value, 10, 700), true, e)}  />
                                             </div>
 
 
 
                                         <div className="form-group col-8">
                                         <label htmlFor="width">Width:</label>
-                                        <input type="number"  max={650} min={100}  placeholder="Width"  defaultValue={this.state.logo.width} onInput={e => this.updateLogo("width", clamp(e.target.value, 100, 650), true, e)}  />
+                                        <input type="number"  max={650} min={10}  placeholder="Width"  defaultValue={this.state.logo.width} onInput={e => this.updateLogo("width", clamp(e.target.value, 10, 650), true, e)}  />
                                         </div>
 
 

@@ -118,12 +118,20 @@ class Text{
         if(props && typeof props != "object")
             throw new Error("Text class requires an object to be instantiated");
 
+        this.reactKey = String(new Date()); // to be used in React Components to represent this text entry
         this.text = props.text || "";
         this.color = props.text || "#000000";
         this.fontSize = props.fontSize || 20;
         this.x = props.x || 0; 
         this.y = props.y || 0; 
 
+
+        // the following attributes are for React component tracking only.
+        // this applies to when a text's position (and therefore z-index) is modified
+        // these references allow us to update the input elements' data
+        this.textInput = undefined; //applies to react components (stores reference to input elemnt for text)
+        this.fontSizeInput =  undefined;
+        this.colorInput = undefined;
     }
 
 }
@@ -160,4 +168,4 @@ class Image{
 }
 
 
-export default Logo;
+export {Logo, Text};

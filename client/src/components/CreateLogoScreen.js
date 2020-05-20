@@ -4,7 +4,7 @@ import { Mutation } from "react-apollo";
 import { Link } from 'react-router-dom';
 import { clamp } from '../utils/utlity';
 import LogoEditor from "../EditorUI/LogoEditor"
-import Logo from "../EditorUI/Logo"
+import {Logo} from "../EditorUI/Logo"
  
 class CreateLogoScreen extends Component { 
 
