@@ -15,7 +15,7 @@ deleteText(index){
 
 
 addImage(){
-    this.images = this.images.concat(new Image());
+    this.images = this.images.concat(new LogoImage());
 }
 
 
@@ -120,7 +120,7 @@ class Text{
 
         this.reactKey = String(new Date()); // to be used in React Components to represent this text entry
         this.text = props.text || "";
-        this.color = props.text || "#000000";
+        this.color = props.color || "#000000";
         this.fontSize = props.fontSize || 20;
         this.x = props.x || 0; 
         this.y = props.y || 0; 
@@ -137,7 +137,7 @@ class Text{
 }
 
 
-class Image{
+class LogoImage{
 
     fetchData(forCss){
         return {
