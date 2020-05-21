@@ -92,7 +92,7 @@ class HomeScreen extends Component {
 
     render() {
         return (
-            <Query pollInterval={30000} query={GET_LOGOS} variables={{email: this.props.session.getUserEmail()}}>
+            <Query pollInterval={500} query={GET_LOGOS} variables={{email: this.props.session.getUserEmail()}}>
                 {({ loading, error, data }) => {
                     if (loading) return 'Loading...';
                     if (error) return `Error! ${error.message}`;
@@ -109,8 +109,7 @@ class HomeScreen extends Component {
 
                                <div onClick={this.showForgotPasswordDialog.bind(this)} className={!this.props.session.getLoggedIn() ? "forgotPasswordButton" : "d-none"}  style={{cursor: "pointer", padding: "25px", fontSize: "23px", fontWeight: "100", textAlign: "center", background: "#001122", color: "white", border: "1px solid #000055"}}>Forgot My Password</div>
 
-                               
-                               
+                                                          
                                 <div onClick={this.logout.bind(this)} className={this.props.session.getLoggedIn() ? "logoutPageLink" : "d-none"}  style={{cursor: "pointer", padding: "25px", fontSize: "23px", fontWeight: "100", textAlign: "center", background: "#330000", color: "white", border: "1px solid #10ee00"}}>Log Out</div>
 
 
@@ -123,8 +122,8 @@ class HomeScreen extends Component {
                             </div>
                             <div className="col s8">
                                 <div id="home_banner_container">
-                                    @todo<br />
-                                    List Maker
+                                
+                                    Logo Maker
                                 </div>
                                 <div>
                                     <Link id="add_logo_button" to="/create" className ={"btn btn-secondary btn-block"}>Add Logo</Link>

@@ -10,7 +10,33 @@ import { isObjectType } from 'graphql';
 
 import html2canvas from "html2canvas"
 
-// REQUIRED PROPS:   Logo / History
+ 
+
+
+const ADD_LOGO = gql`
+mutation ($logo: addLogoInputType) {
+    addLogo(input: $logo) {
+      lastUpdate
+    }
+  }
+`;
+
+
+
+
+const UPDATE_LOGO = gql`
+mutation ($id: String!, $logo: addLogoInputType) {
+    updateLogo(id: $id, input: $logo) {
+      lastUpdate
+    }
+  }
+ 
+`;
+
+
+// REQUIRED PROPS:   Logo / History / action <string> 
+// <LogoEditor logo={} history={} /> 
+//  action ->  "add" or "update"
 class LogoEditor extends Component { 
 
     constructor(props){
@@ -94,7 +120,7 @@ class LogoEditor extends Component {
 
 
     // for logo attributes (border, margin, padding etc)
-    updateLogo(attribute, value, enforceNumberRule, element){
+    updateLogoAttribute(attribute, value, enforceNumberRule, element){
         this.state.logo[attribute] = value;
         this.setState({});
 
@@ -154,7 +180,7 @@ class LogoEditor extends Component {
                         <h4>Image #{index}</h4>
                         <div className="form-group col-8">
                         <label htmlFor="url">Image URL:</label>
-                        <input type="text"   onInput={e => this.updateLogoImage(index, "src", e.target.value)} data-img_ref={index}  className="form-control" name="url"  placeholder="Image URL" />
+                        <input type="text"   onInput={e => this.updateLogoImage(index, "src", e.target.value)} data-img_ref={index} defaultValue={img.src} className="form-control" name="url"  placeholder="Image URL" />
                     </div>
                     <div className="form-group col-4">
                         <label htmlFor="height">Height:</label>
@@ -253,6 +279,8 @@ return (
             )
     }, this );
     
+
+   // console.log(this.state.logo.images);
         var images = this.state.logo.images.map((image, index, array) => (
             <Draggable
             key={"draggable_image_component_" + index}
@@ -296,54 +324,75 @@ alert("please implement this function");
         var logoDisplay = this.generateLogoDisplay();
  
  
+        var mutationFunction = this.props.action == "add" ? ADD_LOGO : this.props.action == "update" ? UPDATE_LOGO : false;
+        if(!mutationFunction) {throw new Error("this.props.action must be 'add' or 'update'.")}
  
+        var userLogo = this.state.logo;
+
         return (
-           
+            <Mutation mutation={mutationFunction} onCompleted={() => this.props.history.push('/')}>
+                {(mutatingFunction, { loading, error }) => (
                     <div className="container">
                         <div className="panel panel-default">
     
                             <div className="panel-body row">
-                                <form className="col-6" style={{height:"500px", background: "rgba(71, 37, 32, 0.51)", overflowY: "scroll"}}>
+                                <form className="col-6" style={{height:"500px", background: "rgba(71, 37, 32, 0.51)", overflowY: "scroll"}} onSubmit={ e => {
+
+//FORM ONSUBMIT
+e.preventDefault();
+
+if(this.props.action == "add") {
+mutatingFunction({variables: { logo: userLogo.serializeForGQL()}}) //see addLogo above in gql for reference
+}
+
+
+else if(this.props.action == "update"){
+    console.log(userLogo.serializeForGQL());
+    mutatingFunction({variables: {id: userLogo.getId(), logo: userLogo.serializeForGQL()}}) //see updateLogo above in gql for reference
+}
+
+                                }
+                                }>
                                   
                                     <div className="form-group col-4">
                                         <label htmlFor="backgroundColor">Background Color:</label>
-                                        <input type="color" className="form-control" name="backgroundColor"   placeholder="Background Color" defaultValue={this.state.logo.backgroundColor} onInput={e => this.updateLogo("backgroundColor", e.target.value)} />
+                                        <input type="color" className="form-control" name="backgroundColor"   placeholder="Background Color" defaultValue={this.state.logo.backgroundColor} onInput={e => this.updateLogoAttribute("backgroundColor", e.target.value)} />
                                     </div>
                                     <div className="form-group col-4">
                                         <label htmlFor="borderColor">Border Color:</label>
-                                        <input type="color" className="form-control" name="borderColor"  placeholder="Border Color" defaultValue={this.state.logo.borderColor}  onInput={e => this.updateLogo("borderColor", e.target.value)}  />
+                                        <input type="color" className="form-control" name="borderColor"  placeholder="Border Color" defaultValue={this.state.logo.borderColor}  onInput={e => this.updateLogoAttribute("borderColor", e.target.value)}  />
                                     </div>
 
 
                                     <div className="form-group col-8">
                                         <label htmlFor="height">Height:</label>
-                                        <input type="number"  max={700} min={10}  placeholder="Height"  defaultValue={this.state.logo.height} onInput={e => this.updateLogo("height", clamp(e.target.value, 10, 700), true, e)}  />
+                                        <input type="number"  max={700} min={10}  placeholder="Height"  defaultValue={this.state.logo.height} onInput={e => this.updateLogoAttribute("height", clamp(e.target.value, 10, 700), true, e)}  />
                                             </div>
 
 
 
                                         <div className="form-group col-8">
                                         <label htmlFor="width">Width:</label>
-                                        <input type="number"  max={650} min={10}  placeholder="Width"  defaultValue={this.state.logo.width} onInput={e => this.updateLogo("width", clamp(e.target.value, 10, 650), true, e)}  />
+                                        <input type="number"  max={650} min={10}  placeholder="Width"  defaultValue={this.state.logo.width} onInput={e => this.updateLogoAttribute("width", clamp(e.target.value, 10, 650), true, e)}  />
                                         </div>
 
 
 
                                     <div className="form-group col-8">
                                         <label htmlFor="borderWidth">Border Width:</label>
-                                        <input type="number"  max={8} min={0}  placeholder="Border Width"  defaultValue={this.state.logo.borderWidth} onInput={e => this.updateLogo("borderWidth", clamp(e.target.value, 0, 8), true, e)}  />
+                                        <input type="number"  max={8} min={0}  placeholder="Border Width"  defaultValue={this.state.logo.borderWidth} onInput={e => this.updateLogoAttribute("borderWidth", clamp(e.target.value, 0, 8), true, e)}  />
                                     </div>
                                     <div className="form-group col-8">
                                         <label htmlFor="borderRadius">Border Radius:</label>
-                                        <input type="number" max={20} min={0} className="form-control" name="borderRadius" defaultValue={ this.state.logo.borderRadius}  placeholder="Border Radius" onInput={e => this.updateLogo("borderRadius", clamp(e.target.value, 0, 20), true, e)} />
+                                        <input type="number" max={20} min={0} className="form-control" name="borderRadius" defaultValue={ this.state.logo.borderRadius}  placeholder="Border Radius" onInput={e => this.updateLogoAttribute("borderRadius", clamp(e.target.value, 0, 20), true, e)} />
                                     </div>
                                     <div className="form-group col-8">
                                         <label htmlFor="padding">Padding:</label>
-                                        <input type="number" max={200} min={0} className="form-control" name="padding" defaultValue={ this.state.logo.padding }  placeholder="Padding" onInput={e => this.updateLogo("padding", clamp(e.target.value, 0, 200), true, e)}/>
+                                        <input type="number" max={200} min={0} className="form-control" name="padding" defaultValue={ this.state.logo.padding }  placeholder="Padding" onInput={e => this.updateLogoAttribute("padding", clamp(e.target.value, 0, 200), true, e)}/>
                                     </div>
                                     <div className="form-group col-8">
                                         <label htmlFor="margin">Margin:</label>
-                                        <input type="number" max={50} min={0} className="form-control" name="margin"  defaultValue={ this.state.logo.margin} placeholder="Margin" onInput={e => this.updateLogo("margin", clamp(e.target.value, 0, 50), true, e)} />
+                                        <input type="number" max={50} min={0} className="form-control" name="margin"  defaultValue={ this.state.logo.margin} placeholder="Margin" onInput={e => this.updateLogoAttribute("margin", clamp(e.target.value, 0, 50), true, e)} />
                                     </div>
 
 
@@ -377,14 +426,17 @@ alert("please implement this function");
                                   
   
 
-
-
                                 </div>
   
+
+                                {loading && <p>Loading...</p>}
+                                {error && <p>Error :( Please try again</p>}
 
                             </div>
                         </div>
                     </div>
+    )}
+                    </Mutation>
                 )}
            
        

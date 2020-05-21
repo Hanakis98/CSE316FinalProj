@@ -30,7 +30,14 @@ class CreateLogoScreen extends Component {
         let userEmail = this.state.userEmail;
         var logo = new Logo();
         return (
-           <LogoEditor history={this.props.history} logo={logo} />
+            <div className="page_container">
+                        <div className="panel panel-default">
+                            <div className="panel-heading">
+                                <h4><Link to="/" className={"btn btn-secondary btn-block"}>Home</Link></h4>
+                                </div>
+                                </div>
+           <LogoEditor history={this.props.history} logo={logo}  action={"add"}/>
+           </div>
         );
     }
 }

@@ -298,6 +298,7 @@ var mutation = new GraphQLObjectType({
                 },
                 resolve: function (root, params) {
                     console.log(params);
+                    console.log(params.input)
                     const logoModel = new LogoModel(params.input);
                     const newLogo = logoModel.save();
                     if (!newLogo) {
@@ -349,8 +350,19 @@ var mutation = new GraphQLObjectType({
                     
                 },
                 resolve(root, params) {
+                    console.log(params.input);
                     return LogoModel.findByIdAndUpdate(params.id,
-                        { texts: params.input.texts, images: params.input.images, lastUpdate: new Date() }, function (err) {
+                        {height: params.input.height, 
+                            width: params.input.width, 
+                            backgroundColor: params.input.backgroundColor, 
+                            borderColor: params.input.borderColor, 
+                            borderWidth: params.input.borderWidth, 
+                            borderRadius: params.input.borderRadius, 
+                            padding: params.input.padding, 
+                            margin: params.input.margin, 
+                            texts: params.input.texts,
+                             images: params.input.images, 
+                             lastUpdate: new Date() }, function (err) {
                         if (err) return next(err);
                     });
                 }

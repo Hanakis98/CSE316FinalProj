@@ -4,24 +4,38 @@ import '../App.css';
 import gql from 'graphql-tag';
 import { Query, Mutation } from 'react-apollo';
 
-const GET_LOGO = gql`
-    query logo($logoId: String) {
-        logo(id: $logoId) {
-            _id
+
+const RETRIEVE_LOGO = gql`
+query logo($logoId: String) {
+    logo(id: $logoId) {
+        _id
+        height
+        width 
+        userEmail
+        backgroundColor
+        borderColor
+        borderWidth
+        borderRadius
+        padding
+        margin
+        lastUpdate
+        texts{
             text
             color
             fontSize
-            backgroundColor
-            borderColor
-            borderWidth
-            borderRadius
-            padding
-            margin
-            lastUpdate
+            x
+            y
+        }
+        images{
+            src
+            width
+            height
+            x
+            y
         }
     }
+}
 `;
-
 const DELETE_LOGO = gql`
   mutation removeLogo($id: String!) {
     removeLogo(id:$id) {
@@ -32,12 +46,135 @@ const DELETE_LOGO = gql`
 
 class ViewLogoScreen extends Component {
 
+    generateLogoDisplay(logo){
+
+        //zindex organizes texts such that elements at beginning of text array will be positioned in front of elements that are placed later in array
+        var texts =  logo.texts.map(function(text, index, array) { 
+            
+        //    text.height = `${text.height}px`;
+         //   text.width = `${text.width}px`;
+           // text.borderWidth = `${text.borderWidth}px`;
+          //  text.borderRadius = `${text.borderRadius}px`;
+           // text.padding = `${text.padding}px`;
+           // text.margin = `${text.margin}px`;
+          //  text.borderStyle = "solid";
+         //   text.overflowY = "hidden";
+         //   text.overflowX = "hidden";
+           
+         var styles = Object.create(text);
+         styles.color = text.color;
+         styles.fontSize = `${text.fontSize}px`;
+         styles.wordWrap = "break-word";
+
+      
+
+         styles.cursor = "default";
+         styles.zIndex = (array.length - index); 
+         styles.transform = `translate(${text.x}px, ${text.y}px)`;
+             return ( 
+            <div key={"logo_text_component_" + index} className="logo_text_component" style={styles}>{text.text}</div> 
+            )
+    }, this );
+    
+
+    
+    
+        var images = logo.images.map(function(image, index, array)  {
+
+    var imageStyles = Object.assign({}, image);
+    imageStyles.height = `${image.height}px`;
+    imageStyles.width = `${image.width}px`;
+             return (
+            <img src={image.src} key={"logo_image_component_" + index}  className="logo_image_component"  style={Object.assign({   transform: `translate(${image.x}px, ${image.y}px)`}, imageStyles)} onError={ function(e){ e.target.src = "https://wfpl.org/wp-content/plugins/lightbox/images/No-image-found.jpg";} } />
+             )
+        }, this)
+
+
+        var logoStyles = Object.assign({}, logo);
+
+        logoStyles.height = `${logo.height}px`
+        logoStyles.width = `${logo.width}px`
+        logoStyles.borderWidth = `${logo.borderWidth}px`
+        logoStyles.borderRadius = `${logo.borderRadius}px`
+        logoStyles.padding = `${logo.padding}px`
+        logoStyles.margin = `${logo.margin}px`
+        logoStyles.overflow = "hidden"
+
+        var logo = (
+            <div className="user_logo" style={logoStyles}>
+                {texts}
+                {images}
+            </div>
+        )
+
+        return logo;
+
+    }
+
+
+
+    generateLogoMetaDisplay(logo){
+
+        var logoUI = (
+            <div className="row">
+
+                </div>
+        )
+
+    }
+
+
     render() {
         return (
-            <Query pollInterval={500} query={GET_LOGO} variables={{ logoId: this.props.match.params.id }}>
+            <Query pollInterval={500} query={RETRIEVE_LOGO} variables={{ logoId: this.props.match.params.id }}>
                 {({ loading, error, data }) => {
                     if (loading) return 'Loading...';
                     if (error) return `Error! ${error.message}`;
+
+                    var texts = data.logo.texts;
+                    var textComponentsUI = data.logo.texts.map(function(text, index){
+                        return(
+                        <dd>{text.text} - (Font Size: {text.fontSize}) (Color: {text.color}) (x: {text.x}) (y: {text.y})</dd>
+                        )
+                    }, this)
+
+
+                    var imageComponentsUI = data.logo.images.map(function(image, index){
+                        return(
+                        <dd>{image.src} - (Height: {image.height}) (Width: {image.width}) (x: {image.x}) (y: {image.y})</dd>
+                        )
+                    }, this)
+
+
+                    var finalImageUI = (
+                        <div>
+                            <dt>Images:</dt>
+                            {imageComponentsUI}
+                        </div>
+                    )
+
+
+                    var finalTextUI = (
+                        <div>
+                        <dt>Texts:</dt>
+                        {textComponentsUI}
+                        </div>
+                    );
+
+
+                    var finalLogoUI = (
+                        <div>
+                            <dt>Logo Metadata:</dt>
+                    <dd>Height: {data.logo.height}px</dd>
+                    <dd>Width: {data.logo.width}px</dd>
+                    <dd>Background Color: {data.logo.backgroundColor}</dd>
+                    <dd>Border Color: {data.logo.borderColor}</dd>
+                    <dd>Border Radius: {data.logo.borderRadius}px</dd>
+                    <dd>Padding: {data.logo.padding}px</dd>
+                    <dd>Margin: {data.logo.margin}px</dd>
+                        </div>
+                    )
+
 
                     return (
                         <div className="container">
@@ -51,24 +188,13 @@ class ViewLogoScreen extends Component {
                                 <div className="panel-body row">
                                     <div className="col-6">
                                         <dl>
-                                            <dt>Text:</dt>
-                                            <dd>{data.logo.text}</dd>
-                                            <dt>Color:</dt>
-                                            <dd>{data.logo.color}</dd>
-                                            <dt>BackgroundColor:</dt>
-                                            <dd>{data.logo.backgroundColor}</dd>
-                                            <dt>BorderColor:</dt>
-                                            <dd>{data.logo.borderColor}</dd>
-                                            <dt>Font Size:</dt>
-                                            <dd>{data.logo.fontSize}</dd>
-                                            <dt>Border Width:</dt>
-                                            <dd>{data.logo.borderWidth}</dd>
-                                            <dt>Border Radius:</dt>
-                                            <dd>{data.logo.borderRadius}</dd>
-                                            <dt>Padding:</dt>
-                                            <dd>{data.logo.padding}</dd>
-                                            <dt>Margin:</dt>
-                                            <dd>{data.logo.margin}</dd>
+                                            
+                                            {finalTextUI}
+                                            {finalLogoUI}
+                                            {finalImageUI}
+
+
+
                                             <dt>Last Updated:</dt>
                                             <dd>{data.logo.lastUpdate}</dd>
                                         </dl>
@@ -90,18 +216,7 @@ class ViewLogoScreen extends Component {
                                     </Mutation>
                                     </div>
                                     <div className="col-6">
-                                        <span style={{
-                                            display: "inline-block",
-                                            color: data.logo.color,
-                                            backgroundColor: data.logo.backgroundColor,
-                                            borderColor: data.logo.borderColor,
-                                            borderStyle: "solid",
-                                            fontSize: data.logo.fontSize + "pt",
-                                            borderWidth: data.logo.borderWidth + "px",
-                                            borderRadius: data.logo.borderRadius + "px",
-                                            padding: data.logo.padding + "px",
-                                            margin: data.logo.margin + "px"
-                                        }}>{data.logo.text}</span>
+                   {this.generateLogoDisplay(data.logo)}
                                     </div>
                                 </div>
                             </div>

@@ -2,6 +2,27 @@ import Session from "../Session/Session"
 
 class Logo{
 
+
+   // USE THIS WHEN PERFORMING GRAPHQL QUERIES 
+   serializeForGQL(){
+
+    return {
+        userEmail:  this.userEmail,
+        height: this.height, 
+        width:  this.width,
+        backgroundColor: this.backgroundColor,
+        borderColor: this.borderColor,
+        borderWidth:  this.borderWidth,
+        borderRadius:  this.borderRadius,
+        padding:  this.padding,
+        margin:  this.margin,
+        texts:this.texts.map(function(t){return t.serializeForGQL()}),
+        images:  this.images.map(function(i){return i.serializeForGQL()}),
+    }
+}
+
+
+
 addText(){
     this.texts = this.texts.concat(new Text());
 }
@@ -48,14 +69,29 @@ fetchData(forCss){
         overflowX: forCss ? "hidden" : false 
     }
 
+
+  
+
 }
 
 
+
+getId(){
+    return this.id;
+}
 
     constructor(props){
 
         var defaultProps = {}
         if(!props) props = defaultProps;
+
+
+        // DO NOT SERIALIZE THIS . IF YOU HAVE A NEED TO USE ID, retrieve it USING Logo.getId()
+        if(props._id)   
+        this.id = props._id || false;
+
+        this.texts = []
+        this.images = [];
 
        
         this.userEmail = Session.getUserEmail();
@@ -81,11 +117,11 @@ fetchData(forCss){
  
   
 
-            for(let text in props.texts)
+            for(let text of props.texts)
                 this.texts =  this.texts.concat(new Text(text))
 
-            for(let image in props.images)
-                this.images = this.images.concat(new Image(image))
+            for(let image of props.images)
+                this.images = this.images.concat(new LogoImage(image))
 
 
     }
@@ -101,6 +137,16 @@ fetchData(forCss){
 class Text{
 
 
+    serializeForGQL(){
+        return {
+            text:  this.text,
+            color:  this.color,
+            fontSize: this.fontSize,
+            x: this.x,
+            y:  this.y,
+        }
+    }
+
     fetchData(forCss){
         return {
             text: forCss ? false : this.text,
@@ -115,6 +161,8 @@ class Text{
     constructor(props){
 
         if(!props) props = {};
+
+        console.log(props);
 
         if(props && typeof props != "object")
             throw new Error("Text class requires an object to be instantiated");
@@ -139,6 +187,16 @@ class Text{
 
 
 class LogoImage{
+
+    serializeForGQL(){
+        return {
+            src: this.src,
+            height:  this.height,
+            width:  this.width,
+            x:  this.x,
+            y:  this.y 
+        }
+    }
 
     fetchData(forCss){
         return {
