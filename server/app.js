@@ -17,7 +17,7 @@ const MongoStore = require('connect-mongo')(session);
 
 
 
-mongoose.connect('mongodb://localhost/node-graphql', { promiseLibrary: require('bluebird'), useNewUrlParser: true })
+mongoose.connect('mongodb://localhost/node-graphql', { useUnifiedTopology: true , promiseLibrary: require('bluebird'), useNewUrlParser: true})
   .then(() =>  console.log('connection successful'))
   .catch((err) => console.error(err));
 
